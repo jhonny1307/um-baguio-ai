@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Carregando...</title>
+
+<!-- Favicon -->
+<link rel="icon" href="icon.png">
+
+<!-- Anchors -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.3.1/anchor.min.js"></script>
+
+<!-- Marked -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- HTML2PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 40px;
+    background: #fafafa;
+}
+
+#content {
+    max-width: 900px;
+    margin: auto;
+}
+
+/* ===== PDF RULES ===== */
+
+h1 {
+    break-before: page;
+    break-after: page;
+    text-align: center;
+    margin-top: 40vh;
+}
+
+h2 {
+    break-before: page;
+}
+
+/* ===== BOTÃO PDF ===== */
+#pdfBtn {
+    position: fixed;
+    top: 5px;
+    right: 5px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #111;
+    color: white;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+#pdfBtn:hover {
+    background: #333;
+}
+</style>
+</head>
+
+<body>
+
+<button id="pdfBtn">Gerar PDF</button>
+
+<div id="content"></div>
+
+<script>
+
+let pageTitle = "README"; // fallback caso não tenha título
+
+/* ===== LOAD README.MD ===== */
+
+fetch("README.md")
+.then(r => r.text())
+.then(md => {
+
+    const html = marked.parse(md);
+    const contentEl = document.getElementById("content");
+    contentEl.innerHTML = html;
+
+    // Anchors
+    anchors.add('h1, h2, h3, h4, h5, h6');
+
+    // ===== PEGAR PRIMEIRO TÍTULO =====
+    const firstHeading = contentEl.querySelector("h1, h2, h3, h4, h5, h6");
+
+    if (firstHeading) {
+        pageTitle = firstHeading.textContent.trim();
+        document.title = pageTitle;
+    }
+
+});
+
+/* ===== PDF BUTTON ===== */
+
+document.getElementById("pdfBtn").onclick = () => {
+
+    const element = document.getElementById("content");
+
+    const opt = {
+        margin: 5,
+        filename: pageTitle + ".pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: {
+            unit: "px",
+            format: "a4",
+            orientation: "portrait"
+        },
+        pagebreak: { mode: ["css", "legacy"] }
+    };
+
+    html2pdf().set(opt).from(element).save();
+};
+
+</script>
+
+</body>
+</html>
