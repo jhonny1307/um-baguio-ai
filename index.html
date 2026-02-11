@@ -2,10 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Carregando...</title>
-
-<!-- Favicon -->
-<link rel="icon" href="icon.png">
+<title>Markdown Viewer + PDF</title>
 
 <!-- Anchors -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.3.1/anchor.min.js"></script>
@@ -31,6 +28,7 @@ body {
 
 /* ===== PDF RULES ===== */
 
+/* H1 sozinho página + centralizado */
 h1 {
     break-before: page;
     break-after: page;
@@ -38,6 +36,7 @@ h1 {
     margin-top: 40vh;
 }
 
+/* H2 começa página */
 h2 {
     break-before: page;
 }
@@ -69,29 +68,18 @@ h2 {
 <div id="content"></div>
 
 <script>
-
-let pageTitle = "README"; // fallback caso não tenha título
-
 /* ===== LOAD README.MD ===== */
 
 fetch("README.md")
 .then(r => r.text())
 .then(md => {
 
+    // Markdown -> HTML
     const html = marked.parse(md);
-    const contentEl = document.getElementById("content");
-    contentEl.innerHTML = html;
+    document.getElementById("content").innerHTML = html;
 
-    // Anchors
+    // Anchors nos títulos
     anchors.add('h1, h2, h3, h4, h5, h6');
-
-    // ===== PEGAR PRIMEIRO TÍTULO =====
-    const firstHeading = contentEl.querySelector("h1, h2, h3, h4, h5, h6");
-
-    if (firstHeading) {
-        pageTitle = firstHeading.textContent.trim();
-        document.title = pageTitle;
-    }
 
 });
 
@@ -103,7 +91,7 @@ document.getElementById("pdfBtn").onclick = () => {
 
     const opt = {
         margin: 5,
-        filename: pageTitle + ".pdf",
+        filename: "README.pdf",
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: {
@@ -116,7 +104,6 @@ document.getElementById("pdfBtn").onclick = () => {
 
     html2pdf().set(opt).from(element).save();
 };
-
 </script>
 
 </body>
